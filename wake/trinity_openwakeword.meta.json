@@ -1,0 +1,9 @@
+{
+  "wakeWord": "Trinity",
+  "historyPath": "/home/guy/.openclaw/workspace/apps/voice-ui/data/history.jsonl",
+  "positivesUsed": 5,
+  "negativesUsed": 20,
+  "threshold": 0.4,
+  "aucHoldout": 0.9285714285714286,
+  "modelPath": "/home/guy/.openclaw/workspace/apps/voice-ui/wake/trinity_openwakeword.pkl"
+}
