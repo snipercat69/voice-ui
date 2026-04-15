@@ -1,0 +1,9 @@
+{
+  "lastLightTarget": "living_room_lights",
+  "pendingAction": {
+    "kind": "light_on",
+    "target": "living_room_lights",
+    "brightness": null,
+    "createdAt": "2026-04-05T19:28:26"
+  }
+}
