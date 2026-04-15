@@ -1,0 +1,36 @@
+[
+  {
+    "id": "voice-local-test-local-audio-reminde-1775399136",
+    "text": "test local audio reminder",
+    "minutes": 0,
+    "dueAt": "2026-04-05T10:25:36",
+    "spoken": true,
+    "createdAt": "2026-04-05T10:25:36",
+    "spokenAt": "2026-04-05T10:25:39",
+    "audioPath": "/home/guy/.openclaw/workspace/out/voice-ui-20260405-102536-reminder-test-local-audio-reminder-this-is-your-re.mp3",
+    "spokenText": "Reminder: test local audio reminder. This is your reminder from 0 minutes ago."
+  },
+  {
+    "id": "voice-local-stand-up-1775399474",
+    "text": "stand up",
+    "minutes": 1,
+    "dueAt": "2026-04-05T10:32:14",
+    "spoken": true,
+    "createdAt": "2026-04-05T10:31:14",
+    "spokenAt": "2026-04-05T10:32:19",
+    "audioPath": "/home/guy/.openclaw/workspace/out/voice-ui-20260405-103218-reminder-stand-up-this-is-your-reminder-from-1-min.mp3",
+    "spokenText": "Reminder: stand up. This is your reminder from 1 minute ago."
+  },
+  {
+    "id": "voice-local-stand-up-1775431311",
+    "text": "stand up",
+    "minutes": 2,
+    "dueAt": "2026-04-05T19:23:51",
+    "spoken": true,
+    "createdAt": "2026-04-05T19:21:51",
+    "snoozeCount": 0,
+    "spokenAt": "2026-04-05T19:24:02",
+    "audioPath": "/home/guy/.openclaw/workspace/out/voice-ui-20260405-192400-reminder-stand-up-this-is-your-reminder-from-2-min.mp3",
+    "spokenText": "Reminder: stand up. This is your reminder from 2 minutes ago."
+  }
+]
