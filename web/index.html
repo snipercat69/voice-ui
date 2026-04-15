@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenClaw Voice UI</title>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --panel: #ffffff;
+        --border: #d8dcea;
+        --text: #101624;
+        --muted: #5d6781;
+        --accent: #2f6df6;
+        --ok: #0e9f6e;
+        --warn: #d97706;
+        --err: #dc2626;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f1422;
+          --panel: #151c2f;
+          --border: #2a3554;
+          --text: #e8edff;
+          --muted: #9ca8ca;
+          --accent: #6ea0ff;
+          --ok: #34d399;
+          --warn: #fbbf24;
+          --err: #f87171;
+        }
+      }
+      body {
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        margin: 0;
+        padding: 28px 28px 40px;
+        min-height: 100vh;
+        background:
+          linear-gradient(rgba(4, 6, 10, 0.58), rgba(8, 10, 16, 0.68)),
+          radial-gradient(circle at top, color-mix(in oklab, var(--accent) 10%, transparent), transparent 38%),
+          radial-gradient(circle at top right, color-mix(in oklab, #f43f5e 8%, transparent), transparent 30%),
+          url('/assets/fsociety-bg.jpg') center center / cover fixed no-repeat,
+          var(--bg);
+        color: var(--text);
+        box-sizing: border-box;
+      }
+      .app-shell {
+        width: min(1700px, calc(100vw - 48px));
+        margin: 0 auto;
+      }
+      .row { margin-bottom: 18px; }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .section-card {
+        border: none;
+        border-radius: 12px;
+        background: transparent;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        padding: 14px;
+      }
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .section-title {
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+      .hero-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      .hero-shell {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.82), rgba(255,241,242,0.92));
+        border: 1px solid rgba(248, 113, 113, 0.22);
+        box-shadow: 0 10px 30px rgba(220, 38, 38, 0.10);
+        backdrop-filter: blur(10px);
+      }
+      .hero-title h1 {
+        margin: 0;
+        letter-spacing: 0.02em;
+        line-height: 1;
+        background: linear-gradient(90deg, #ef4444 0%, #dc2626 40%, #f43f5e 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 18px rgba(239, 68, 68, 0.16);
+      }
+      .lobster-badge {
+        width: 46px;
+        height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #fff1f2, #ffe4e6 55%, #ffe4f1);
+        border: 1px solid #fecdd3;
+        box-shadow: 0 8px 24px rgba(220, 38, 38, 0.18);
+        font-size: 28px;
+        line-height: 1;
+        transform: translateY(0px) rotate(0deg);
+        transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+        filter: saturate(1.05);
+      }
+      .hero-shell:hover .lobster-badge {
+        transform: translateY(-1px) rotate(-6deg) scale(1.04);
+        box-shadow: 0 12px 28px rgba(220, 38, 38, 0.24);
+        filter: saturate(1.2);
+      }
+      .hero-kicker {
+        display: block;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .hero-copy {
+        display: flex;
+        flex-direction: column;
+      }
+      @media (prefers-color-scheme: dark) {
+        .hero-shell {
+          background: linear-gradient(135deg, rgba(34, 16, 24, 0.82), rgba(56, 18, 30, 0.7));
+          border-color: rgba(248, 113, 113, 0.24);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), 0 0 28px rgba(244, 63, 94, 0.08);
+        }
+        .hero-title h1 {
+          background: linear-gradient(90deg, #fb7185 0%, #f87171 45%, #f43f5e 100%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          text-shadow: 0 0 24px rgba(248, 113, 113, 0.14);
+        }
+        .lobster-badge {
+          background: linear-gradient(135deg, rgba(127, 29, 29, 0.55), rgba(190, 24, 93, 0.28));
+          border-color: rgba(248, 113, 113, 0.35);
+          box-shadow: 0 8px 22px rgba(248, 113, 113, 0.12);
+        }
+      }
+      button {
+        padding: 10px 14px;
+        margin-right: 8px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(255,255,255,0.09);
+        color: var(--text);
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+        backdrop-filter: blur(6px);
+      }
+      button:hover {
+        background: rgba(255,255,255,0.16);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+        transform: translateY(-1px);
+      }
+      button:active {
+        transform: translateY(0);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+      #holdBtn {
+        background: rgba(239, 68, 68, 0.32);
+        color: #fca5a5;
+        border-color: rgba(239, 68, 68, 0.45);
+        box-shadow: 0 6px 18px rgba(239, 68, 68, 0.20);
+      }
+      #holdBtn:hover {
+        background: rgba(239, 68, 68, 0.42);
+        box-shadow: 0 10px 24px rgba(239, 68, 68, 0.28);
+      }
+      #recordBtn, #applyVoiceBtn, #previewVoiceBtn {
+        background: rgba(110, 160, 255, 0.18);
+        border-color: rgba(110, 160, 255, 0.35);
+      }
+      #stopBtn {
+        background: rgba(251, 191, 36, 0.18);
+        border-color: rgba(251, 191, 36, 0.35);
+      }
+      #holdBtn.recording {
+        background: rgba(185, 28, 28, 0.48);
+        border-color: rgba(239, 68, 68, 0.65);
+      }
+      #log {
+        white-space: pre-wrap;
+        border: none;
+        padding: 12px;
+        min-height: 120px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.06);
+      }
+      .muted { color: var(--muted); font-size: 0.95rem; }
+      label {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      select, input[type="text"] {
+        margin-left: 6px;
+        padding: 9px 11px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.08);
+        color: var(--text);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+        transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+        backdrop-filter: blur(6px);
+      }
+      select:hover, input[type="text"]:hover {
+        border-color: rgba(110, 160, 255, 0.50);
+        background: rgba(255,255,255,0.12);
+      }
+      select:focus, input[type="text"]:focus {
+        outline: none;
+        border-color: rgba(110, 160, 255, 0.65);
+        box-shadow: 0 0 0 3px rgba(110, 160, 255, 0.18), 0 6px 18px rgba(0,0,0,0.12);
+      }
+      input[type="checkbox"] {
+        accent-color: #ef4444;
+      }
+      .panel-title { font-weight: 650; margin-bottom: 8px; }
+      .compact-note {
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+      .details-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.92rem;
+        color: var(--muted);
+        cursor: pointer;
+        user-select: none;
+      }
+      .details-panel {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid color-mix(in oklab, var(--border) 40%, rgba(255,255,255,0.08));
+      }
+      .hero-tip {
+        margin-top: 10px;
+        font-size: 0.92rem;
+        color: var(--muted);
+        padding: 8px 12px;
+        border: none;
+        border-radius: 10px;
+        background: transparent;
+      }
+      .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .controls-grid { display:grid; grid-template-columns: 1.2fr .8fr; gap: 18px; }
+      .conversation-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+      .chat-block, #history {
+        border: none;
+        border-radius: 12px;
+        background: transparent;
+        padding: 14px;
+      }
+        box-shadow: none;
+        backdrop-filter: none;
+      }
+      .chat-bubble {
+        border: none;
+        border-radius: 8px;
+        padding: 6px 10px;
+        min-height: 26px;
+        margin-bottom: 4px;
+        font-size: 0.88rem;
+        background: rgba(255,255,255,0.07);
+      }
+      .chat-bubble.user {
+        background: rgba(110, 160, 255, 0.14);
+      }
+      .chat-bubble.assistant {
+        background: rgba(52, 211, 153, 0.10);
+      }
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.16);
+        font-size: .9rem;
+        background: rgba(255,255,255,0.08);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+        backdrop-filter: blur(6px);
+      }
+      .status-recording {
+        border-color: color-mix(in oklab, var(--warn) 70%, #f43f5e);
+        color: var(--warn);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--warn) 18%, transparent);
+      }
+      .status-processing {
+        border-color: color-mix(in oklab, var(--accent) 72%, #f43f5e);
+        color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 16%, transparent);
+      }
+      .status-done {
+        border-color: color-mix(in oklab, var(--ok) 72%, #34d399);
+        color: var(--ok);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--ok) 14%, transparent);
+      }
+      .status-error {
+        border-color: color-mix(in oklab, var(--err) 76%, #f43f5e);
+        color: var(--err);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--err) 14%, transparent);
+      }
+      .spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid transparent;
+        border-top-color: var(--accent);
+        border-right-color: var(--accent);
+        border-radius: 50%;
+        animation: spin .8s linear infinite;
+        display: none;
+      }
+      .spinner.show { display: inline-block; }
+      @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      .banner {
+        display: none;
+        margin-top: 8px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(251, 191, 36, 0.35);
+        background: rgba(251, 191, 36, 0.10);
+        color: var(--text);
+      }
+      .banner.show { display: block; }
+      .wave-wrap {
+        margin-top: 6px;
+        border: none;
+        border-radius: 999px;
+        overflow: hidden;
+        height: 5px;
+        background: rgba(255,255,255,0.12);
+      }
+      .wave-progress {
+        height: 100%;
+        width: 0%;
+        background: repeating-linear-gradient(
+          90deg,
+          color-mix(in oklab, var(--accent) 65%, var(--panel)) 0px,
+          color-mix(in oklab, var(--accent) 65%, var(--panel)) 6px,
+          color-mix(in oklab, var(--accent) 35%, var(--panel)) 6px,
+          color-mix(in oklab, var(--accent) 35%, var(--panel)) 10px
+        );
+        transition: width .12s linear;
+      }
+      #toast {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        background: #111;
+        color: #fff;
+        padding: 10px 12px;
+        border-radius: 8px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all .2s ease;
+        pointer-events: none;
+        max-width: 420px;
+      }
+      #toast.show {
+        opacity: 0.95;
+        transform: translateY(0);
+      }
+      #history {
+        max-height: 340px;
+        overflow: auto;
+      }
+      .audio-shell {
+        border: none;
+        border-radius: 12px;
+        background: transparent;
+        padding: 10px 14px;
+        margin-top: 14px;
+      }
+      .audio-shell audio {
+        width: 25%;
+        display: block;
+        border-radius: 12px;
+        margin: 0 auto;
+      }
+      .turn {
+        border: none;
+        border-radius: 0;
+        padding: 10px 0;
+        margin-bottom: 6px;
+        background: transparent;
+        border-bottom: 1px solid color-mix(in oklab, var(--border) 40%, rgba(255,255,255,0.08));
+      }
+      .reminder-upcoming { border-bottom-color: rgba(110, 160, 255, 0.35); }
+      .reminder-due { border-bottom-color: rgba(251, 191, 36, 0.5); }
+      .reminder-spoken { border-bottom-color: rgba(52, 211, 153, 0.4); }
+      .reminder-dismissed { opacity: 0.6; }
+      .reminder-countdown {
+        font-size: 0.88rem;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .turn .meta { font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
+      .turn .bubble { padding: 6px 8px; border-radius: 8px; margin-bottom: 6px; }
+      .turn .bubble.user { background: #f4f7ff; }
+      .turn .bubble.assistant { background: #f7fff4; }
+      .turn .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+      .turn .actions a { font-size: .9rem; color: var(--accent); text-decoration: none; }
+      @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+      @media (max-width: 900px) { .controls-grid { grid-template-columns: 1fr; } }
+      @media (max-width: 900px) { .conversation-grid { grid-template-columns: 1fr; } }
+      @media (max-width: 700px) {
+        body {
+          padding: 14px 14px 28px;
+        }
+        .app-shell {
+          width: 100%;
+        }
+        .row {
+          margin-bottom: 12px;
+        }
+        .hero-shell {
+          width: 100%;
+          justify-content: flex-start;
+        }
+        button, select, input[type="text"] {
+          width: 100%;
+          margin: 6px 0 0 0;
+          box-sizing: border-box;
+        }
+        label {
+          display: block;
+          margin-top: 8px;
+        }
+        .status-chip {
+          margin-top: 6px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+    <div class="hero-title">
+      <div class="hero-shell">
+        <span class="lobster-badge" aria-hidden="true">🦞</span>
+        <div class="hero-copy">
+          <span class="hero-kicker">Cyber Lobster Interface</span>
+          <h1>OpenClaw Voice UI</h1>
+        </div>
+      </div>
+    </div>
+
+    <p class="muted">Local voice loop: hold to talk → transcribe → reply → spoken playback.</p>
+
+    <div class="controls-grid row">
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Talk Controls</div>
+            <div class="compact-note">Press and hold to talk, or use wake mode in this tab.</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="holdBtn" title="Hold to talk">🎙️ Hold to Talk</button>
+          <button id="recordBtn">🎙️ Start Recording</button>
+          <button id="stopBtn" disabled>⏹️ Stop</button>
+        </div>
+        <div class="toolbar" style="margin-top:10px;">
+          <span id="status" class="status-chip">Initializing…</span>
+          <span id="processingSpinner" class="spinner" aria-hidden="true"></span>
+          <span class="compact-note">Latency: <span id="latency">—</span></span>
+          <span id="wakeStatus" class="compact-note">Wake word idle</span>
+        </div>
+        <div class="hero-tip">Fast path: hold the mic, speak, get a reply. Spacebar also works.</div>
+        <label class="details-toggle"><input type="checkbox" id="showTalkDetails" onclick="this.parentElement.nextElementSibling.style.display=this.checked?'block':'none'" /> Show talk options</label>
+        <div id="talkDetails" class="details-panel" style="display:none;">
+          <div class="toolbar">
+            <label><input type="checkbox" id="autoplay" checked /> Auto-play reply</label>
+            <label><input type="checkbox" id="wakeEnable" checked /> Wake word: <strong>"Trinity"</strong></label>
+            <span class="compact-note">Use wake mode if you want hands-free control in this tab.</span>
+          </div>
+        </div>
+        <div id="autoplayWarning" class="banner">⚠️ Autoplay was blocked by the browser. Click replay on a turn or use the player controls.</div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Voice Settings</div>
+            <div class="compact-note">Choose the voice stack and reply style without digging through clutter.</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <label>Provider
+            <select id="voiceProvider">
+              <option value="fish">fish</option>
+              <option value="elevenlabs">elevenlabs</option>
+              <option value="local-piper">local-piper</option>
+              <option value="local-kokoro">local-kokoro</option>
+              <option value="minimax">minimax</option>
+            </select>
+          </label>
+          <label>Model
+            <select id="voiceModel"></select>
+          </label>
+          <label>Fast Agent
+            <select id="fastAgent">
+              <option value="voice-fast">voice-fast (gpt-5.4-mini)</option>
+              <option value="voice-spark">voice-spark (gpt-5.3-codex-spark)</option>
+              <option value="voice-51mini">voice-51mini (gpt-5.1-codex-mini)</option>
+            </select>
+          </label>
+          <label>Fast Model
+            <select id="fastModel">
+              <option value="">Agent Default</option>
+              <option value="openai-codex/gpt-5.4-mini">GPT-5.4 Mini (OpenAI)</option>
+              <option value="openai-codex/gpt-5.3-codex">GPT-5.3 Codex (OpenAI)</option>
+              <option value="openai-codex/gpt-5.1">GPT-5.1 (OpenAI)</option>
+              <option value="minimax/MiniMax-M2.7">MiniMax M2.7 (minimax)</option>
+            </select>
+          </label>
+        </div>
+        <label class="details-toggle"><input type="checkbox" id="showVoiceDetails" onclick="this.parentElement.nextElementSibling.style.display=this.checked?'block':'none'" /> Show advanced voice options</label>
+        <div id="voiceDetails" class="details-panel" style="display:none;">
+          <div class="toolbar" style="flex-wrap:wrap; gap:8px;">
+            <label style="flex:0 1 auto;">Reference / Voice ID
+              <input id="voiceRef" type="text" placeholder="optional id" style="width:140px; font-size:0.80rem;" />
+            </label>
+            <label id="minimaxVoiceWrap" style="display:none; flex:0 1 auto;">MiniMax Voice
+              <select id="minimaxVoiceSelect" style="min-width:240px;"></select>
+            </label>
+            <label style="white-space:nowrap;">Reply Style
+              <select id="replyStyle">
+                <option value="short">short</option>
+                <option value="normal" selected>normal</option>
+                <option value="deep">deep</option>
+              </select>
+            </label>
+            <label><input type="checkbox" id="fastMode" /> Fast mode</label>
+          </div>
+          <div class="toolbar" style="margin-top:10px;">
+            <button id="applyVoiceBtn">Apply Voice</button>
+            <button id="previewVoiceBtn">Preview Voice</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row section-card" id="voiceCatalogSection" style="max-width:380px;">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Voice Catalog <button id="toggleCatalogBtn" style="font-size:11px; padding:2px 6px; cursor:pointer; background:none; border:none; color:inherit;">▼</button></div>
+          <div class="compact-note">Curated presets for quick switching instead of guesswork.</div>
+        </div>
+        <label class="muted">View
+          <select id="catalogMode">
+            <option value="basic">Basic</option>
+            <option value="expanded">Expanded</option>
+          </select>
+        </label>
+      </div>
+      <label class="details-toggle"><input type="checkbox" id="showCatalogDetails" onclick="this.parentElement.nextElementSibling.style.display=this.checked?'block':'none'" /> Show catalog filters</label>
+      <div id="catalogDetails" class="details-panel" style="display:none;">
+        <div id="catalogFilters" style="margin-bottom:8px;"></div>
+      </div>
+      <div id="catalog" style="display:none; border:1px solid #ddd; border-radius:12px; padding:10px; background:var(--panel); max-height:220px; overflow:auto;"></div>
+    </div>
+
+    <div class="conversation-grid row">
+      <div class="chat-block">
+        <div class="panel-title">Latest Turn</div>
+        <div id="transcript" class="chat-bubble user">(waiting)</div>
+        <div id="reply" class="chat-bubble assistant">(waiting)</div>
+      </div>
+      <div>
+        <div class="panel-title">Recent Turns <button id="toggleHistoryBtn" style="font-size:11px; padding:2px 6px; cursor:pointer; background:none; border:none; color:inherit;">▲</button></div>
+        <div id="history"></div>
+      </div>
+    </div>
+
+    <div class="conversation-grid row">
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Upcoming Reminders</div>
+            <div class="compact-note">Local reminders that will speak in this tab.</div>
+          </div>
+        </div>
+        <div id="reminderList"></div>
+      </div>
+      <div>
+        <div class="section-head">
+          <div>
+            <div class="section-title">Reminder History <button id="dismissReminderHistoryBtn" style="font-size:11px; padding:2px 6px; cursor:pointer; background:none; border:none; color:inherit;">✕</button></div>
+            <div class="compact-note">Recently spoken or dismissed reminders.</div>
+          </div>
+        </div>
+        <div id="reminderHistory"></div>
+      </div>
+    </div>
+
+    <div class="row" style="border-radius:12px; padding:14px; margin-top:14px;">
+      <div class="section-head" style="margin-bottom:8px;">
+        <strong>Log <button id="toggleLogBtn" style="font-size:11px; padding:2px 6px; cursor:pointer; background:none; border:none; color:inherit;">▲</button></strong>
+      </div>
+      <div id="log">UI loaded.</div>
+    </div>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <div class="row audio-shell">
+      <audio id="player" controls preload="none"></audio>
+      <div class="wave-wrap"><div id="waveProgress" class="wave-progress"></div></div>
+    </div>
+    </div>
+
+    <script src="/app.js?q=202604051502"></script>
+  </body>
+</html>
