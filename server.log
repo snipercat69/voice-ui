@@ -1,0 +1,2 @@
+/home/guy/.openclaw/workspace/apps/voice-ui/server.py:13: DeprecationWarning: 'cgi' is deprecated and slated for removal in Python 3.13
+  import cgi
